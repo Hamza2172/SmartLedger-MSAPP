@@ -1,0 +1,3 @@
+Request → Route → authMiddleware → isAdmin → Controller → Service → Repository → Model → DB
+                                                  ↓
+                                          notifyAdmins() → Socket.io → all admins
