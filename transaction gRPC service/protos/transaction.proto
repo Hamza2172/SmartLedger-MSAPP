@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package transaction;
+
+
+enum TransactionType {
+    INCOME = 0;
+    EXPENSE = 1;
+}
+
+message Transaction {
+    string id = 1;
+    string userId = 2;
+    optional TransactionType type = 3;
+    float amount = 4;
+    string currency = 5;
+    string note = 6;
+    string category = 7;
+    string createdAt = 8;
+    string updatedAt = 9;
+}
+
+message CreateTransactionRequest {
+    string userId = 1;
+    optional TransactionType type = 2;
+    float amount = 3;
+    string currency = 4;
+    string note = 5;
+    string category = 6;
+}
+
+message GetTransactionRequest {string id = 1;}
+
+message ListTransactionsRequest {
+    string userId = 1;
+    optional TransactionType type = 2;
+    int32 page = 3;
+    int32 limit = 4;
+}
+
+message UpdateTransactionRequest {
+    string id = 1;
+    optional float amount = 2;
+    optional string currency = 3;
+    optional string note = 4;
+    optional string category = 5;
+}
+
+message DeleteTransactionRequest {
+    string id = 1;
+}
+
+message ListTransactionsResponse {
+    repeated Transaction transactions = 1;
+    int32 total = 2;
+}
+
+message DeleteTransactionResponse {
+    bool success = 1;
+}
+
+
+service TransactionService {
+    rpc CreateTransaction (CreateTransactionRequest) returns (Transaction);
+    rpc GetTransaction (GetTransactionRequest) returns (Transaction);
+    rpc ListTransactions (ListTransactionsRequest) returns (ListTransactionsResponse);
+    rpc UpdateTransaction (UpdateTransactionRequest) returns (Transaction);
+    rpc DeleteTransaction (DeleteTransactionRequest) returns (DeleteTransactionResponse);
+}
