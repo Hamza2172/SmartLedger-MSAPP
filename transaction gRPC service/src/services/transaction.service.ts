@@ -1,6 +1,7 @@
 import * as grpc from "@grpc/grpc-js";
 import { prisma } from "../../lib/prisma";
 
+import { TransactionType as prismaTransactionType } from "../../generated/prisma/enums";
 import {
     TransactionType,
     Transaction,
@@ -81,6 +82,7 @@ export async function createTransactionService(
     callback: grpc.sendUnaryData<Transaction>,
 ): Promise<void> {
     try {
+        console.log("here ")
         const { userId, type, amount, currency, note, category } = call.request;
         if (!userId || !currency) {
             return callback({
@@ -88,21 +90,27 @@ export async function createTransactionService(
                 message: "userId and currency are required",
             });
         }
+        console.log(typeof type, type, userId, type !== undefined
+                        ? type === TransactionType.EXPENSE
+                            ? prismaTransactionType.EXPENSE
+                            : prismaTransactionType.INCOME
+                        : prismaTransactionType.INCOME,)
         const record = await prisma.transaction.create({
             data: {
                 userId,
                 type:
                     type !== undefined
                         ? type === TransactionType.EXPENSE
-                            ? "EXPENSE"
-                            : "INCOME"
-                        : "INCOME",
+                            ? prismaTransactionType.EXPENSE
+                            : prismaTransactionType.INCOME
+                        : prismaTransactionType.INCOME,
                 amount: amount ?? 0,
                 currency,
                 note: note ?? "",
                 category: category ?? "",
             },
         });
+        // console.log(record.type);
         callback(null, toProtoTransaction(record));
     } catch (error) {
         internalError(callback, error);
@@ -142,7 +150,9 @@ export async function listTransactionService(
 
         if (type !== undefined) {
             where.type =
-                type === TransactionType.EXPENSE ? "EXPENSE" : "INCOME";
+                type === TransactionType.EXPENSE
+                    ? prismaTransactionType.EXPENSE
+                    : prismaTransactionType.INCOME;
         }
 
         const records = await prisma.transaction.findMany({
@@ -151,6 +161,9 @@ export async function listTransactionService(
             take,
             orderBy: { createdAt: "desc" },
         });
+        console.log(where);
+        console.log(skip);
+        console.log(take);
         console.log(records);
 
         const total = await prisma.transaction.count({ where });

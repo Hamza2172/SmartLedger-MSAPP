@@ -5,10 +5,10 @@ async function main() {
     const transaction = await prisma.transaction.create({
         data: {
             userId: "123",
-            type: "INCOME",
-            amount: 50,
+            type: "EXPENSE",
+            amount: 100,
             currency: "USD",
-            note: "my first income",
+            note: "my expense",
             category: "",
         },
     });
